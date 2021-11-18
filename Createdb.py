@@ -26,7 +26,7 @@ def Customer():
     random.shuffle(combine)
     return combine
 
-def orders():
+def Orders():
     csvread_x = open("olist_orders_dataset.csv","r")
     reader_x = csv.reader(csvread_x)
 
@@ -62,7 +62,7 @@ def sellers():
     
     random.shuffle(combine2)
     return combine2
-def order_items():
+def Order_items():
     csvread_z = open("olist_order_items_dataset.csv","r")
     reader_z = csv.reader(csvread_z)
 
@@ -93,7 +93,7 @@ def smallDB(customer,order,seller,items):
     conn = sqlite3.connect('A3Small.db')
     c=conn.cursor()
     #customers
-    c.execute('''DROP TABLE IF EXIST Customers''')
+    c.execute('''DROP TABLE IF EXISTS Customers''')
     c.execute('''CREATE TABLE Customers (
                     "customer_id" TEXT,
                     "customer_postal_code", INTEGER,
@@ -102,10 +102,10 @@ def smallDB(customer,order,seller,items):
         '''
     )
     for i in range (10000):
-        c.execute('''INSERT INTO Customers(customer_id, customer_post_code)
+        c.execute('''INSERT INTO Customers(customer_id, customer_postal_code)
                         VALUES(?,?);''',customer[i])
     #order
-    c.execute('''DROP TABLE IF EXIST Orders''')
+    c.execute('''DROP TABLE IF EXISTS Orders''')
     c.execute('''CREATE TABLE Orders (
                     "order_id" TEXT,
                     "customer_id", TEXT,
@@ -116,36 +116,35 @@ def smallDB(customer,order,seller,items):
     )
     for i in range (10000):
         c.execute('''INSERT INTO Orders(order_id, customer_id)
-                        VALUES(?,?);''',orders[i])
+                        VALUES(?,?);''',order[i])
 #sellers
-    c.execute('''DROP TABLE IF EXIST Sellers''')
+    c.execute('''DROP TABLE IF EXISTS Sellers''')
     c.execute('''CREATE TABLE Sellers (
                     "seller_id" TEXT,
                     "seller_postal_code", INTEGER,
-                    PRIMARY KEY("seller_id"),
+                    PRIMARY KEY("seller_id")
                     );
-        '''
-    )
+        ''')
+    
     for i in range (500):
         c.execute('''INSERT INTO Sellers(seller_id, seller_postal_code)
-                        VALUES(?,?);''',sellers[i])
+                        VALUES(?,?);''',seller[i])
      #Order_items
-    c.execute('''DROP TABLE IF EXIST Order_items''')
+    c.execute('''DROP TABLE IF EXISTS Order_items''')
     c.execute('''CREATE TABLE Order_items (
                     "order_id" TEXT,
                     "order_item_id" INTEGER,
                     "product_id" TEXT,
-                    "seller_id" TEXT
+                    "seller_id" TEXT,
                     PRIMARY KEY("order_id","order_item_id","product_id","seller_id"),
-	                FOREIGN KEY("seller_id") REFERENCES "Sellers"("seller_id")
+	                FOREIGN KEY("seller_id") REFERENCES "Sellers"("seller_id"),
 	                FOREIGN KEY("order_id") REFERENCES "Orders"("order_id")
                     );
         '''
     )
     for i in range (2000):
-        c.execute('''INSERT INTO Orders(order_id, order_item_id,product_id,seller_id)
-                        VALUES(?,?,?,?);''',order_items[i])
+        c.execute('''INSERT INTO Order_items(order_id,order_item_id,product_id,seller_id)
+                        VALUES(?,?,?,?);''',items[i])
     conn.commit()
     conn.close()
-
-smallDB(Customer(),order
+smallDB(Customer(),Orders(),sellers(),Order_items())
