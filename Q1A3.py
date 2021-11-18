@@ -1,34 +1,33 @@
 import sqlite3
 # matplotlib.pyplot will allow us to create visualizations of our results
 import matplotlib.pyplot as plt
-import numpy as np 
+import numpy as np
+
+#from Createdb import smallDB 
 
 #Given a random customer_postal_code from Customers, 
 #find how many orders have been placed by customers 
 #who have that customer_postal_code.
 
 
+def smallDBQuery():
 
+    global connection, cursor
 
-'''
-SELECT COUNT(order_id)
-FROM Customers C ,Orders O
-WHERE
-C.customer_id = O.customer_id AND C.customer_postal_code = 4777
+    cursor.execute( '''
+    SELECT COUNT(order_id) 
+    FROM Customers C, Orders O 
+    WHERE C.customer_id = O.customer_id AND
+    customer_postal_code = (SELECT C.customer_postal_code 
+    FROM Customers C ORDER BY random() LIMIT 1);''')
+    
+    s = cursor.fetchone()
+    print(s)
 
+    #p_flag = float(input('Include random postal code'))
+    #cursor.execute(query,{'pflag': p_flag})
 
-
-query = 
-    SELECT NEIGHBOURHOOD, CAST (SUM(FEMALE) AS REAL)/SUM(MALE) 
-    FROM Census2012 
-    WHERE( FEMALE + MALE)>:4777
-    GROUP BY NEIGHBOURHOOD
-
-    t_flag = float(input('Include threshold: ')) 
-    # execute query with provided flags
-    cursor.execute(query, {'tflag': t_flag })
-
-'''
+    #find a way to print order_id
 
 
 
@@ -65,10 +64,10 @@ def main():
         # input function will return string so compare to strings
         if query_selection == '1':
             smallDBQuery()
-        elif query_selection == '2':
-            mediumDBQuery()
-        elif query_selection == '3':
-            largeDBQuery()
+       # elif query_selection == '2':
+            #mediumDBQuery()
+        #elif query_selection == '3':
+            #largeDBQuery()
         # if user selects 3 break program while loop and exit program
         elif query_selection == '4':
             print('Goodbye :)')
