@@ -44,11 +44,11 @@ def differentDB(amount):
 
 
     #open data.csv
-    csvread_2 = open("data.csv","r")
-    reader_2 = csv.reader(csvread_2)
+    csvread_3 = open("data.csv","r")
+    reader_3 = csv.reader(csvread_3)
     #skip the title line
-    next(reader_2)
-    clist = [row[1] for row in reader_2]
+    next(reader_3)
+    clist = [row[1] for row in reader_3]
 
     random.shuffle(clist)
     #get madein_list
