@@ -2,6 +2,11 @@ import csv
 import random
 import sqlite3
 import time
+#cursor.execute(' PRAGMA foreign_keys=ON; ')
+
+#to do list
+# create each db A3Small.db, A3Medium.db and A3Large.db
+# organize each by cardinality 
 
 """
 This function will create different amount of data list
