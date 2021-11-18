@@ -89,14 +89,15 @@ def Order_items():
     
     random.shuffle(combine3)
     return combine3
+
 def smallDB(customer,order,seller,items):
     conn = sqlite3.connect('A3Small.db')
     c=conn.cursor()
     #customers
     c.execute('''DROP TABLE IF EXISTS Customers''')
     c.execute('''CREATE TABLE Customers (
-                    "customer_id" TEXT,
-                    "customer_postal_code" INTEGER,
+                    customer_id TEXT,
+                    customer_postal_code INTEGER,
                     PRIMARY KEY("customer_id")
                     );
         '''
@@ -107,8 +108,8 @@ def smallDB(customer,order,seller,items):
     #order
     c.execute('''DROP TABLE IF EXISTS Orders''')
     c.execute('''CREATE TABLE Orders (
-                    "order_id" TEXT,
-                    "customer_id" TEXT,
+                    order_id TEXT,
+                    customer_id TEXT,
                     PRIMARY KEY("order_id"),
                     FOREIGN KEY("customer_id") REFERENCES "Customers"("custoemr_id")
                     );
@@ -147,4 +148,127 @@ def smallDB(customer,order,seller,items):
                         VALUES(?,?,?,?);''',items[i])
     conn.commit()
     conn.close()
+#smallDB function
 smallDB(Customer(),Orders(),sellers(),Order_items())
+
+#mediumDB
+def mediumDB(customer,order,seller,items):
+    conn = sqlite3.connect('A3Medium.db')
+    c=conn.cursor()
+    #customers
+    c.execute('''DROP TABLE IF EXISTS Customers''')
+    c.execute('''CREATE TABLE Customers (
+                    customer_id TEXT,
+                    customer_postal_code INTEGER,
+                    PRIMARY KEY("customer_id")
+                    );
+        '''
+    )
+    for i in range (20000):
+        c.execute('''INSERT INTO Customers(customer_id, customer_postal_code)
+                        VALUES(?,?);''',customer[i])
+    #order
+    c.execute('''DROP TABLE IF EXISTS Orders''')
+    c.execute('''CREATE TABLE Orders (
+                    order_id TEXT,
+                    customer_id TEXT,
+                    PRIMARY KEY("order_id"),
+                    FOREIGN KEY("customer_id") REFERENCES "Customers"("custoemr_id")
+                    );
+        '''
+    )
+    for i in range (20000):
+        c.execute('''INSERT INTO Orders(order_id, customer_id)
+                        VALUES(?,?);''',order[i])
+#sellers
+    c.execute('''DROP TABLE IF EXISTS Sellers''')
+    c.execute('''CREATE TABLE Sellers (
+                    seller_id TEXT,
+                    seller_postal_code INTEGER,
+                    PRIMARY KEY("seller_id")
+                    );
+        ''')
+    
+    for i in range (750):
+        c.execute('''INSERT INTO Sellers(seller_id, seller_postal_code)
+                        VALUES(?,?);''',seller[i])
+     #Order_items
+    c.execute('''DROP TABLE IF EXISTS Order_items''')
+    c.execute('''CREATE TABLE Order_items (
+                    order_id TEXT,
+                    order_item_id INTEGER,
+                    product_id TEXT,
+                    seller_id TEXT,
+                    PRIMARY KEY("order_id","order_item_id","product_id","seller_id"),
+	                FOREIGN KEY("seller_id") REFERENCES "Sellers"("seller_id"),
+	                FOREIGN KEY("order_id") REFERENCES "Orders"("order_id")
+                    );
+        '''
+    )
+    for i in range (4000):
+        c.execute('''INSERT INTO Order_items(order_id,order_item_id,product_id,seller_id)
+                        VALUES(?,?,?,?);''',items[i])
+    conn.commit()
+    conn.close()
+mediumDB(Customer(),Orders(),sellers(),Order_items())
+
+#largeDB
+def largeDB(customer,order,seller,items):
+    conn = sqlite3.connect('A3Large.db')
+    c=conn.cursor()
+    #customers
+    c.execute('''DROP TABLE IF EXISTS Customers''')
+    c.execute('''CREATE TABLE Customers (
+                    customer_id TEXT,
+                    customer_postal_code INTEGER,
+                    PRIMARY KEY("customer_id")
+                    );
+        '''
+    )
+    for i in range (33000):
+        c.execute('''INSERT INTO Customers(customer_id, customer_postal_code)
+                        VALUES(?,?);''',customer[i])
+    #order
+    c.execute('''DROP TABLE IF EXISTS Orders''')
+    c.execute('''CREATE TABLE Orders (
+                    order_id TEXT,
+                    customer_id TEXT,
+                    PRIMARY KEY("order_id"),
+                    FOREIGN KEY("customer_id") REFERENCES "Customers"("custoemr_id")
+                    );
+        '''
+    )
+    for i in range (33000):
+        c.execute('''INSERT INTO Orders(order_id, customer_id)
+                        VALUES(?,?);''',order[i])
+#sellers
+    c.execute('''DROP TABLE IF EXISTS Sellers''')
+    c.execute('''CREATE TABLE Sellers (
+                    seller_id TEXT,
+                    seller_postal_code INTEGER,
+                    PRIMARY KEY("seller_id")
+                    );
+        ''')
+    
+    for i in range (1000):
+        c.execute('''INSERT INTO Sellers(seller_id, seller_postal_code)
+                        VALUES(?,?);''',seller[i])
+     #Order_items
+    c.execute('''DROP TABLE IF EXISTS Order_items''')
+    c.execute('''CREATE TABLE Order_items (
+                    order_id TEXT,
+                    order_item_id INTEGER,
+                    product_id TEXT,
+                    seller_id TEXT,
+                    PRIMARY KEY("order_id","order_item_id","product_id","seller_id"),
+	                FOREIGN KEY("seller_id") REFERENCES "Sellers"("seller_id"),
+	                FOREIGN KEY("order_id") REFERENCES "Orders"("order_id")
+                    );
+        '''
+    )
+    for i in range (10000):
+        c.execute('''INSERT INTO Order_items(order_id,order_item_id,product_id,seller_id)
+                        VALUES(?,?,?,?);''',items[i])
+    conn.commit()
+    conn.close()
+largeDB(Customer(),Orders(),sellers(),Order_items())
