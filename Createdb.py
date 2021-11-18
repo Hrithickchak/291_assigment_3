@@ -96,7 +96,7 @@ def smallDB(customer,order,seller,items):
     c.execute('''DROP TABLE IF EXISTS Customers''')
     c.execute('''CREATE TABLE Customers (
                     "customer_id" TEXT,
-                    "customer_postal_code", INTEGER,
+                    "customer_postal_code" INTEGER,
                     PRIMARY KEY("customer_id")
                     );
         '''
@@ -108,7 +108,7 @@ def smallDB(customer,order,seller,items):
     c.execute('''DROP TABLE IF EXISTS Orders''')
     c.execute('''CREATE TABLE Orders (
                     "order_id" TEXT,
-                    "customer_id", TEXT,
+                    "customer_id" TEXT,
                     PRIMARY KEY("order_id"),
                     FOREIGN KEY("customer_id") REFERENCES "Customers"("custoemr_id")
                     );
@@ -120,8 +120,8 @@ def smallDB(customer,order,seller,items):
 #sellers
     c.execute('''DROP TABLE IF EXISTS Sellers''')
     c.execute('''CREATE TABLE Sellers (
-                    "seller_id" TEXT,
-                    "seller_postal_code", INTEGER,
+                    seller_id TEXT,
+                    seller_postal_code INTEGER,
                     PRIMARY KEY("seller_id")
                     );
         ''')
@@ -132,10 +132,10 @@ def smallDB(customer,order,seller,items):
      #Order_items
     c.execute('''DROP TABLE IF EXISTS Order_items''')
     c.execute('''CREATE TABLE Order_items (
-                    "order_id" TEXT,
-                    "order_item_id" INTEGER,
-                    "product_id" TEXT,
-                    "seller_id" TEXT,
+                    order_id TEXT,
+                    order_item_id INTEGER,
+                    product_id TEXT,
+                    seller_id TEXT,
                     PRIMARY KEY("order_id","order_item_id","product_id","seller_id"),
 	                FOREIGN KEY("seller_id") REFERENCES "Sellers"("seller_id"),
 	                FOREIGN KEY("order_id") REFERENCES "Orders"("order_id")
