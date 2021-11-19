@@ -1,51 +1,9 @@
 import sqlite3
 import matplotlib.pyplot as plt
 import numpy as np
-
-def view():
-    #this doesnt work
-    global connection, cursor
-    cursor.execute('''
-    create view ordersize as select order_id as oid, order_item_id as size from order_items   group by order_id;
-    ''')
-
-def Query2():
-
-    cursor.execute('''
-    select oid, avg(size) from ordersize 
-    where oid
-    in (SELECT order_id  FROM Customers c, Orders o WHERE c.customer_id = o.customer_id AND customer_postal_code = (SELECT c.customer_postal_code FROM  Customers c ORDER BY random() LIMIT 1));
-     ''')
-    #find a way to print
-    s = cursor.fetchall()
-
-    x = []
-    # iterate through results to build lists
-    for i in s:
-        x.append(i[0])
-    
-    print(x)
-
-# Query 1 using smallDB size
-def smallDBQuery():
-    db_path = './A3small.db'
-    connect(db_path)
-    Query2()
-    connection.close()
-# Query 1 using mediumDB size
-def mediumDBQuery():
-    db_path = './A3medium.db'
-    connect(db_path)
-    Query2()
-    connection.close()
-# Query 1 using mediumDB size
-def largeDBQuery():
-    db_path = './A3large.db'
-    connect(db_path)
-    Query2()
-    connection.close()
-
-
+import time
+connection = None
+cursor = None
 def connect(path):
     # using global variables already defined in main method, not new variables
     global connection, cursor
@@ -59,11 +17,58 @@ def connect(path):
     connection.commit()
     return
 
+def Query2(postal):
+    global connection, cursor
+    
+    view = '''
+    create view ordersize as select order_id as oid, COUNT(DISTINCT order_item_id) as size from order_items group by order_id;
+    '''
+    cursor.execute(view)
+    
+    connection.commit()
+    q = '''
+    select oid, avg(ordersize.size) from Orders, Customers, ordersize 
+    where Orders.customer_id = Customers.customer_id
+    AND Customers.customer_postal_code = :postal AND ordersize.oid = Orders.order_id
+    '''
+    #find a way to print
+    #cursor.execute(q ,{'postal' :postal})
+    s = cursor.fetchall()
+    
+    x = []
+    y = []
+    # iterate through results to build lists
+    for i in s:
+        x.append(i[0])
+        y.append(i[1])
+    
+    print(x)
+    cursor.execute('''DROP VIEW ordersize''')
+    connection.commit()
+
+# Query 1 using smallDB size
+def smallDBQuery(postal):
+    db_path = './A3small.db'
+    connect(db_path)
+    Query2(postal)
+    connection.close()
+# Query 1 using mediumDB size
+def mediumDBQuery():
+    db_path = './A3medium.db'
+    connect(db_path) 
+    Query2()
+    connection.close()
+# Query 1 using mediumDB size
+def largeDBQuery():
+    db_path = './A3large.db'
+    connect(db_path)
+    Query2()
+    connection.close()
+
 def main():
-    view()
-    smallDBQuery()
-    mediumDBQuery()
-    largeDBQuery()
+    smallDBQuery(95020)
+    #mediumDBQuery()
+    #largeDBQuery()
 
     #call all queries 
     #optimize queries 
