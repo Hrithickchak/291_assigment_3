@@ -10,6 +10,10 @@ def Query4():
     global connection, cursor
 
     cursor.execute( '''
+        SELECT count(DISTINCT s.seller_postal_code)  
+        FROM Order_items i, Sellers s 
+        WHERE i.order_id = (SELECT o_i.order_id FROM  Order_items o_i ORDER BY random() LIMIT 1)
+        AND i.seller_id = s.seller_id
    ''')
     
     #print to check
