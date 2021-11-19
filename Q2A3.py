@@ -1,17 +1,14 @@
 import sqlite3
-# matplotlib.pyplot will allow us to create visualizations of our results
 import matplotlib.pyplot as plt
 import numpy as np
 
 #from Createdb import smallDB 
 
-
-
-def smallDBQuery():
+def Query2():
 
     global connection, cursor
 
-    cursor.excute('''CREATE VIEW OrderSize(oid, size)
+    cursor.execute('''CREATE VIEW OrderSize(oid, size)
     AS SELECT order_id, order_item_id    
 	FROM Orders o, Order_items i
      ''')
@@ -19,6 +16,26 @@ def smallDBQuery():
     s = cursor.fetchone()
     print(s)
 
+
+
+# Query 1 using smallDB size
+def smallDBQuery():
+    db_path = './A3small.db'
+    connect(db_path)
+    Query2()
+    connection.close()
+# Query 1 using mediumDB size
+def mediumDBQuery():
+    db_path = './A3medium.db'
+    connect(db_path)
+    Query2()
+    connection.close()
+# Query 1 using mediumDB size
+def largeDBQuery():
+    db_path = './A3large.db'
+    connect(db_path)
+    Query2()
+    connection.close()
 
 
 def connect(path):
@@ -36,39 +53,14 @@ def connect(path):
 
 def main():
     global connection
-    # we will hard code the database name, could also get from user
-    db_path = './A3small.db'
-    #open multiple db paths? medium and large
-    # create connection using function defined above
-    connect(db_path)
-    # loop program until user chooses to exit
-    while(True):
-        # prompt user to selet query
-        print('\nFind how many orders have been placed by customers who have that customer_postal_code.')
-        #Given a random customer_postal_code from Customers, 
-        print('1. Run with smallDB')
-        print('2. Run with mediumDB')
-        print('3. Run with largeDB')
-        print('4. Exit program')
-        query_selection = input('Selection: ')
-        # input function will return string so compare to strings
-        if query_selection == '1':
-            smallDBQuery()
-       # elif query_selection == '2':
-            #mediumDBQuery()
-        #elif query_selection == '3':
-            #largeDBQuery()
-        # if user selects 3 break program while loop and exit program
-        elif query_selection == '4':
-            print('Goodbye :)')
-            break
-        # if user enters anything but 1, 2, or 3 prompt for valid input
-        else:
-            print("\nInvalid input!\nSelection must be 1, 2, 3, 4")
-    
-    # close connection before exiting
-    connection.close()
-  
-# run main method when program starts
+
+    smallDBQuery()
+    mediumDBQuery()
+    largeDBQuery()
+
+    #call all queries 
+    #optimize queries 
+    #make a graph
+
 if __name__ == "__main__":
     main()
