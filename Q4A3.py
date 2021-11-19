@@ -1,38 +1,38 @@
 import sqlite3
 import matplotlib.pyplot as plt
 import numpy as np
-
-#from Createdb import smallDB 
-
-def Query2():
+# Given a random order_id from Orders, 
+# find in how many (unique) postal codes (i.e., cities) 
+# are the sellers that fulfilled that order.
+# main query call
+def Query4():
 
     global connection, cursor
 
-    cursor.execute('''CREATE VIEW OrderSize(oid, size)
-    AS SELECT order_id, order_item_id    
-	FROM Orders o, Order_items i
-     ''')
-    #find a way to print 
+    cursor.execute( '''
+   ''')
+    
+    #print to check
     s = cursor.fetchone()
     print(s)
 
 # Query 1 using smallDB size
 def smallDBQuery():
-    db_path = './A3small.db'
+    db_path = './A3Small.db'
     connect(db_path)
-    Query2()
+    Query4()
     connection.close()
 # Query 1 using mediumDB size
 def mediumDBQuery():
-    db_path = './A3medium.db'
+    db_path = './A3Medium.db'
     connect(db_path)
-    Query2()
+    Query4()
     connection.close()
 # Query 1 using mediumDB size
 def largeDBQuery():
-    db_path = './A3large.db'
+    db_path = './A3Large.db'
     connect(db_path)
-    Query2()
+    Query4()
     connection.close()
 
 
@@ -59,6 +59,7 @@ def main():
     #call all queries 
     #optimize queries 
     #make a graph
+
 
 if __name__ == "__main__":
     main()

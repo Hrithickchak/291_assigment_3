@@ -3,9 +3,6 @@ import random
 import sqlite3
 import time
 
-#cursor.execute(' PRAGMA foreign_keys=ON; ')
-#read organize shuffle customer sellers order items
-
 def Customer():
 
     csvread_1 = open("olist_customers_dataset.csv","r")

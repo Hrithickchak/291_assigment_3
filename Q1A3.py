@@ -25,19 +25,19 @@ def Query1():
 
 # Query 1 using smallDB size
 def smallDBQuery():
-    db_path = './A3small.db'
+    db_path = './A3Small.db'
     connect(db_path)
     Query1()
     connection.close()
 # Query 1 using mediumDB size
 def mediumDBQuery():
-    db_path = './A3medium.db'
+    db_path = './A3Medium.db'
     connect(db_path)
     Query1()
     connection.close()
 # Query 1 using mediumDB size
 def largeDBQuery():
-    db_path = './A3large.db'
+    db_path = './A3Large.db'
     connect(db_path)
     Query1()
     connection.close()
