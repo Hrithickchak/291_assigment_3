@@ -2,26 +2,29 @@ import sqlite3
 import matplotlib.pyplot as plt
 import numpy as np
 
-#from Createdb import smallDB 
-def view_creator():
-
+def view():
+    #this doesnt work
     global connection, cursor
-
     cursor.execute('''
     create view ordersize as select order_id as oid, order_item_id as size from order_items   group by order_id;
-       ''')
-    #find a way to print 
+    ''')
 
 def Query2():
-
-    global connection, cursor
 
     cursor.execute('''
     select oid, avg(size) from ordersize 
     where oid
     in (SELECT order_id  FROM Customers c, Orders o WHERE c.customer_id = o.customer_id AND customer_postal_code = (SELECT c.customer_postal_code FROM  Customers c ORDER BY random() LIMIT 1));
      ''')
-    #find a way to print 
+    #find a way to print
+    s = cursor.fetchall()
+
+    x = []
+    # iterate through results to build lists
+    for i in s:
+        x.append(i[0])
+    
+    print(x)
 
 # Query 1 using smallDB size
 def smallDBQuery():
@@ -57,8 +60,7 @@ def connect(path):
     return
 
 def main():
-    global connection
-
+    view()
     smallDBQuery()
     mediumDBQuery()
     largeDBQuery()
