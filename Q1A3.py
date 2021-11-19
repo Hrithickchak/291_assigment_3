@@ -20,8 +20,14 @@ def Query1():
     FROM Customers C ORDER BY random() LIMIT 1);''')
     
     #print to check
-    s = cursor.fetchone()
-    print(s)
+    s = cursor.fetchall()
+
+    x = []
+    # iterate through results to build lists
+    for i in s:
+        x.append(i[0])
+    
+    print(x)
 
 # Query 1 using smallDB size
 def smallDBQuery():
