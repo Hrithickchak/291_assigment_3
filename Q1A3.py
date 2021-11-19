@@ -2,10 +2,11 @@ import sqlite3
 import matplotlib.pyplot as plt
 import numpy as np
 import time
-
+#initialize uni self and user arrays
 uni=[]
 self=[]
 user=[]
+
 #from Createdb import smallDB 
 #Given a random customer_postal_code from Customers, 
 #find how many orders have been placed by customers 
@@ -15,7 +16,7 @@ user=[]
 def Query1():
 
     global connection, cursor
-
+    
     cursor.execute( '''
     SELECT COUNT(order_id) 
     FROM Customers C, Orders O 
@@ -23,15 +24,6 @@ def Query1():
     customer_postal_code = (SELECT C.customer_postal_code 
     FROM Customers C ORDER BY random() LIMIT 1);''')
     
-    #print to check
-    #s = cursor.fetchall()
-
-    #x = []
-    # iterate through results to build lists
-    #for i in s:
-        #x.append(i[0])
-    
-    #print(x)
 def uniformed():
     cursor.execute('PRAGMA automatic_index =False')
     cursor.execute('PRAGMA foreign_keys=OFF;')
@@ -177,7 +169,7 @@ def largeDBQuery():
     print(self)
     print(user)
 
-
+# connect path is from MA5 example code. this brings in the connection for path
 def connect(path):
     # using global variables already defined in main method, not new variables
     global connection, cursor

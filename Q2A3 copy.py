@@ -1,179 +1,10 @@
 import sqlite3
-import matplotlib.pyplot as plt
-import numpy as np
+import random
 import time
+import matplotlib.pyplot as plt
 
-uni=[]
-self=[]
-user=[]
-#from Createdb import smallDB 
-#Given a random customer_postal_code from Customers, 
-#find how many orders have been placed by customers 
-#who have that customer_postal_code.
-
-#main query call
-def Query3():
-
-    global connection, cursor
-
-    query = ''' SELECT COUNT(*), AVG(OS.size)
-                FROM Orders O, Customers C, ( SELECT order_id as oid, COUNT(DISTINCT order_item_id) as size FROM Order_items O GROUP BY O.order_id )as OS
-                WHERE O.customer_id = C.customer_id
-                AND C.customer_postal_code=:code
-                AND OS.oid=O.order_id
-            '''
-    t = time.process_time()
-    cursor.execute(query,{"code":code})
-
-    #print to check
-    s = cursor.fetchone()
-    print(s)
-    
-def uniformed():
-    cursor.execute('PRAGMA automatic_index =False')
-    cursor.execute('PRAGMA foreign_keys=OFF;')
-    cursor.execute('''CREATE TABLE IF NOT EXISTS CustomersNew (
-                        "customer_id" TEXT,
-                        "customer_postal_code" INTEGER);''')
-    cursor.execute('''CREATE TABLE IF NOT EXISTS OrdersNew(
-                        "order_id" TEXT, 
-                        "customer_id" Text);''')
-    cursor.execute('''CREATE TABLE IF NOT EXISTS SellersNew(
-                        "seller_id" TEXT, 
-                        "seller_postal_code" INTEGER);''')
-    cursor.execute('''CREATE TABLE IF NOT EXISTS Order_itemsNew(
-                        "order_id" TEXT, 
-                        "order_item_id" INTEGER,
-                        "product_id" TEXT,
-                        "seller_id" TEXT);''')
-
-
-    cursor.execute('''INSERT INTO CustomersNew
-                        SELECT customer_id, customer_postal_code 
-                        FROM Customers;''')
-    cursor.execute('''INSERT INTO OrdersNew 
-                        SELECT order_id, customer_id
-                        FROM Orders;''')
-    cursor.execute('''INSERT INTO SellersNew 
-                        SELECT seller_id, seller_postal_code
-                        FROM Sellers;''')
-    cursor.execute('''INSERT INTO Order_itemsNew 
-                        SELECT order_id, order_item_id, product_id, seller_id
-                        FROM Order_items;''')
-
-
-    cursor.execute('''ALTER TABLE Customers RENAME TO CustomersOrg;''')
-    cursor.execute('''ALTER TABLE Orders RENAME TO OrdersOrg;''')
-    cursor.execute('''ALTER TABLE Sellers RENAME TO SellersOrg;''')
-    cursor.execute('''ALTER TABLE Order_items RENAME TO Order_itemsOrg;''')
-
-    cursor.execute('''ALTER TABLE CustomersNew RENAME TO Customers;''')
-    cursor.execute('''ALTER TABLE OrdersNew RENAME TO Orders;''')
-    cursor.execute('''ALTER TABLE SellersNew RENAME TO Sellers;''')
-    cursor.execute('''ALTER TABLE Order_itemsNew RENAME TO Order_items;''')
-def self_opt():
-    cursor.execute('PRAGMA automatic_index=True;')
-    cursor.execute('PRAGMA foreign_keys=ON;')
-def user_opt():
-    self_opt()
-    cursor.execute('''DROP INDEX IF EXISTS c_index;''')
-    cursor.execute('''DROP INDEX IF EXISTS p_index;''')
-    cursor.execute('''CREATE INDEX c_index ON Customers(customer_id)''')
-    cursor.execute('''CREATE INDEX p_index ON Customers(customer_postal_code)''')
-
-def collectTime():
-    runningTimeList = []
-    for i in range (50):
-        start = time.time()
-        Query1()
-        end = time.time()
-        runningTime = end - start
-        runningTimeList.append(runningTime)
-    avgTime = sum(runningTimeList)*1000/50
-    return avgTime
-def drop():
-    cursor.execute('''DROP TABLE IF EXISTS Customers;''')
-    cursor.execute('''DROP TABLE IF EXISTS Orders;''')
-    cursor.execute('''DROP TABLE IF EXISTS Sellers;''')
-    cursor.execute('''DROP TABLE IF EXISTS Order_items;''')
-    cursor.execute('''ALTER TABLE CustomersOrg RENAME TO Customers;''')
-    cursor.execute('''ALTER TABLE OrdersOrg RENAME TO Orders;''')
-    cursor.execute('''ALTER TABLE SellersOrg RENAME TO Sellers;''')
-    cursor.execute('''ALTER TABLE Order_itemsOrg RENAME TO Orders_items;''')
-
-# Query 1 using smallDB size
-def smallDBQuery():
-    #uniformed
-    db_path = './A3Small.db'
-    connect(db_path)
-    uniformed()
-    uni.append(collectTime())
-    drop()
-    connection.close()
-    #self-optimization
-    db_path = './A3Small.db'
-    connect(db_path)
-    self_opt()
-    self.append(collectTime())
-    connection.close()
-    #user-optimization
-    db_path = './A3Small.db'
-    connect(db_path)
-    user_opt()
-    user.append(collectTime())
-    connection.close()
-   
-    
-    
-# Query 1 using smallDB size
-
-def mediumDBQuery():
-    #uniformed
-    db_path = './A3Medium.db'
-    connect(db_path)
-    uniformed()
-    uni.append(collectTime())
-    drop()
-    connection.close()
-    #self-optimization
-    db_path = './A3Medium.db'
-    connect(db_path)
-    self_opt()
-    self.append(collectTime())
-    connection.close()
-    #user-optimization
-    db_path = './A3Medium.db'
-    connect(db_path)
-    user_opt()
-    user.append(collectTime())
-    connection.close()
-   
-# Query 1 using mediumDB size
-def largeDBQuery():
-    #uniformed
-    db_path = './A3Large.db'
-    connect(db_path)
-    uniformed()
-    uni.append(collectTime())
-    drop()
-    connection.close()
-    #self-optimization
-    db_path = './A3Large.db'
-    connect(db_path)
-    self_opt()
-    self.append(collectTime())
-    connection.close()
-    #user-optimization
-    db_path = './A3Large.db'
-    connect(db_path)
-    user_opt()
-    user.append(collectTime())
-   
-    connection.close()
-    print(uni)
-    print(self)
-    print(user)
-
+connection = None
+cursor = None
 
 def connect(path):
     # using global variables already defined in main method, not new variables
@@ -185,32 +16,203 @@ def connect(path):
     # execute a sql statement to enforce foreign key constraint
     cursor.execute(' PRAGMA foreign_keys=ON; ')
     # commit the changes we have made so they are visible by any other connections
-    connection.commit()
+    connection.commit() 
     return
-def plot():
-    labels=["small","medium","large"]
-    fig,ax=plt.subplots()
-    ax.bar(labels,uni,0.5,label='uniformed')
-    ax.bar(labels,self,0.5,bottom=uni,label='self-optimization')
-    ax.bar(labels,user,0.5,bottom = list(map(lambda x,y: x+y, uni, self)) ,label='user-optimization')
-    ax.set_ylabel('time (ms)')
-    ax.set_title('Query 1 (runtime in ms)')
-    ax.legend()
 
-    plt.show()
+def query(code):
+    global connection, cursor
+    #The query to be executed  
+    view= '''CREATE VIEW OrderSize
+             AS SELECT order_id as oid, COUNT(DISTINCT order_item_id) as size
+             FROM Order_items O
+             GROUP BY O.order_id
+             
+    '''
+    cursor.execute(view)
+    
+    
+    connection.commit()
+    
+    query = ''' SELECT COUNT(*), AVG(OS.size)
+                FROM Orders O, Customers C, OrderSize OS
+                WHERE O.customer_id = C.customer_id
+                AND C.customer_postal_code=:code
+                AND OS.oid=O.order_id
+                
+                
+             
+    '''
+    #found this method from https://stackoverflow.com/questions/7370801/how-to-measure-elapsed-time-in-python
+    t = time.process_time()
+    cursor.execute(query,{"code":code})
+    elapsed_time = time.process_time() - t
+    #Commit the query to the DB
+    cursor.execute('''DROP VIEW OrderSize''')
+    connection.commit()
+    
+ 
+    
+    return elapsed_time
+
+def uninformed(code):
+    global connection, cursor
+    cursor.execute(' PRAGMA automatic_indexing=OFF; ')
+    ordersnew = '''
+    CREATE TABLE "OrdersNew" ("order_id"	TEXT,"customer_id" TEXT);
+    INSERT INTO OrdersNew
+    SELECT order_id, customer_id
+    FROM Orders;
+    ALTER TABLE Orders RENAME TO OrdersOriginal;
+    ALTER TABLE OrdersNew RENAME TO Orders;
+    '''
+    cursor.executescript(ordersnew)
+    
+     
+    Customersnew = '''
+    CREATE TABLE "CustomersNew" ("customer_id" TEXT, "customer_postal_code" INTEGER);
+    INSERT INTO CustomersNew 
+    SELECT customer_id, customer_postal_code 
+    FROM Customers;
+    ALTER TABLE Customers RENAME TO CustomersOriginal;
+    ALTER TABLE CustomersNew RENAME TO Customers;
+    ''' 
+    cursor.executescript(Customersnew)
+    connection.commit()
+    
+    time_=query(code)
+    
+    cursor.execute('''DROP TABLE Customers;''')
+    cursor.execute('''ALTER TABLE CustomersOriginal RENAME TO Customers;''')
+    cursor.execute(''' DROP TABLE Orders;''')
+    cursor.execute('''ALTER TABLE OrdersOriginal RENAME TO Orders;''')
+    connection.commit()
+    
+    return time_*1000
+
+def self_optimized(code):
+    global connection, cursor
+    cursor.execute(' PRAGMA automatic_index = TRUE; ')
+    connection.commit()
+    time_=query(code)
+    return time_*1000
 
 
+def user_optimized(code):
+    global connection, cursor
+    cursor.execute(' PRAGMA automatic_index = FALSE; ')
+   
+    index_ = ''' CREATE INDEX customer_index ON Customers (customer_postal_code, customer_id);
+                 CREATE INDEX order_index ON Orders (customer_id, order_id);'''
+    cursor.executescript(index_)
+    connection.commit()
+    time_=query(code)
+    cursor.execute('''DROP INDEX customer_index''')
+    cursor.execute('''DROP INDEX order_index''')
+    connection.commit()
+    return time_*1000
+    
+    
+    
+    
 def main():
-    global connection
+    global connection, cursor
 
-    smallDBQuery()
-    mediumDBQuery()
-    largeDBQuery()
-    plot()
-    #call all queries 
-    #optimize queries 
-    #make a graph
-
-
+    paths=['./A3small.db', './A3Medium.db', './A3Large.db']
+   
+    uninformedtime=[]
+    self_optimizedtime=[]
+    user_optimizedtime=[]     
+    
+    
+    for p in paths:
+        times=[]
+        connect(p)
+        #get a list of all postal codes
+        codes=[]
+        query='''SELECT C.customer_postal_code
+                 FROM Customers C
+        '''
+        cursor.execute(query)
+        rows=cursor.fetchall()
+        for each in rows:
+            codes.append(str(each[0]))
+        #print(codes)
+        
+        for i in range(50): #uninformed scenario
+            times.append(uninformed(random.choice(codes)))
+            #get average time from times array
+            #https://www.geeksforgeeks.org/find-average-list-python/
+        avg_time=sum(times)/len(times)
+        uninformedtime.append(avg_time)
+        
+        connection.close()
+        connect(p)
+        
+        times=[]
+        for i in range(50): #selfoptimized scenario
+            #use random function to pick random postal code
+            times.append(self_optimized(random.choice(codes)))
+            
+        avg_time=sum(times)/len(times)
+        self_optimizedtime.append(avg_time)
+        
+        connection.close()
+        connect(p)
+        
+        
+        times=[]
+        for i in range(50):
+            times.append(user_optimized(random.choice(codes)))
+        
+        avg_time=sum(times)/len(times)
+        user_optimizedtime.append(avg_time)
+            
+        connection.close()
+    
+   # print('uninformed',uninformedtime)
+   # print('self-optimize',self_optimizedtime)
+   # print('user-optimize',user_optimizedtime)
+    
+    
+    bar_chart(uninformedtime, self_optimizedtime, user_optimizedtime)
+    
+def bar_chart(uninformedtime,self_optimizedtime,user_optimizedtime):
+    width = 0.35
+    #making stacked bar charts using resource provided on assignment page
+    labels = ['SmallDB', 'MediumDB', 'LargeDB']
+    uninformed_results=[]
+    uninformed_results=uninformedtime
+    self_optimized_results=[]
+    self_optimized_results=self_optimizedtime
+    user_optimized_results=[]
+    user_optimized_results=user_optimizedtime
+    last_sum=[]
+    for i in range(3):
+        last_sum.append(uninformed_results[i] + self_optimized_results[i])
+        
+    
+    
+    
+    
+    fig, ax = plt.subplots()
+    
+    ax.bar(labels, uninformed_results, width,  label='Uninformed')
+    ax.bar(labels, self_optimized_results, width, bottom=uninformed_results,
+    label='Self-Optimized')
+    ax.bar(labels, user_optimized_results, width, bottom=last_sum,
+    label='User-Optimized')
+    ax.set_title('Query 2 (runtime in ms)')
+    ax.legend()
+    
+    path = './{}chart.png'.format('Q2A3')
+    plt.savefig(path)
+    print('Chart saved to file {}'.format(path))
+    
+    
+    # close figure so it doesn't display
+    plt.close()
+    return
+    
+# run main method when program starts
 if __name__ == "__main__":
     main()

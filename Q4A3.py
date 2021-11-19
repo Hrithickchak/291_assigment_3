@@ -2,7 +2,7 @@ import sqlite3
 import matplotlib.pyplot as plt
 import numpy as np
 import time
-
+#initialize uni self and user arrays
 uni=[]
 self=[]
 user=[]
@@ -22,8 +22,13 @@ def Query4():
    ''')
     
     #print to check
-    #s = cursor.fetchone()
-    #print(s)
+    #s = cursor.fetchall()
+
+    #x = []
+    # iterate through results to build lists
+    #for i in s:
+        #x.append(i[0])
+
 def uniformed():
     cursor.execute('PRAGMA automatic_index =False')
     cursor.execute('PRAGMA foreign_keys=OFF;')
@@ -56,7 +61,7 @@ def uniformed():
                         SELECT order_id, order_item_id, product_id, seller_id
                         FROM Order_items;''')
 
-
+#rename is execute so that each table is unique when ran 50 times
     cursor.execute('''ALTER TABLE Customers RENAME TO CustomersOrg;''')
     cursor.execute('''ALTER TABLE Orders RENAME TO OrdersOrg;''')
     cursor.execute('''ALTER TABLE Sellers RENAME TO SellersOrg;''')
@@ -73,7 +78,7 @@ def user_opt():
     self_opt()
     cursor.execute('''DROP INDEX IF EXISTS o_index;''')
     cursor.execute('''CREATE INDEX o_index ON Orders(order_id)''')
-
+#collectTime function runs the list 50 times and outputs the average time for each database
 def collectTime():
     runningTimeList = []
     for i in range (50):
@@ -84,6 +89,7 @@ def collectTime():
         runningTimeList.append(runningTime)
     avgTime = sum(runningTimeList)*1000/50
     return avgTime
+#drop() drops all old tables and replaces them with the original names 
 def drop():
     cursor.execute('''DROP TABLE IF EXISTS Customers;''')
     cursor.execute('''DROP TABLE IF EXISTS Orders;''')
@@ -93,6 +99,9 @@ def drop():
     cursor.execute('''ALTER TABLE OrdersOrg RENAME TO Orders;''')
     cursor.execute('''ALTER TABLE SellersOrg RENAME TO Sellers;''')
     cursor.execute('''ALTER TABLE Order_itemsOrg RENAME TO Orders_items;''')
+
+# The definitions for each query is defined here. This is also where self, user and uniformed is ran
+
 # Query 4 using smallDB size
 def smallDBQuery():
     #uniformed
@@ -114,11 +123,7 @@ def smallDBQuery():
     user_opt()
     user.append(collectTime())
     connection.close()
-   
-    
-    
-# Query 4 using smallDB size
-
+# Query 4 using mediumDB size 
 def mediumDBQuery():
     #uniformed
     db_path = './A3Medium.db'
@@ -140,7 +145,7 @@ def mediumDBQuery():
     user.append(collectTime())
     connection.close()
    
-# Query 4 using mediumDB size
+# Query 4 using largeDB size
 def largeDBQuery():
     #uniformed
     db_path = './A3Large.db'
@@ -166,7 +171,7 @@ def largeDBQuery():
     print(self)
     print(user)
 
-
+# connect path is from MA5 example code. this brings in the connection for path
 def connect(path):
     # using global variables already defined in main method, not new variables
     global connection, cursor
@@ -179,6 +184,8 @@ def connect(path):
     # commit the changes we have made so they are visible by any other connections
     connection.commit()
     return
+
+# plot takes uni, self and user and graphs them in a bar graph
 def plot():
     labels=["small","medium","large"]
     fig,ax=plt.subplots()
